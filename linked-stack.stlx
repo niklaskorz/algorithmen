@@ -1,8 +1,8 @@
 // Stack with linked list
 
-class Node() {
-    data := om;
-    next := om;
+class Node(data, next) {
+    data := data;
+    next := next;
 
     static {
         equals := procedure(rhs) {
@@ -29,10 +29,7 @@ class Stack() {
             return mTop == om;
         };
         push := procedure(x) {
-            node := Node();
-            node.data := x;
-            node.next := mTop;
-            this.mTop := node;
+            this.mTop := Node(x, mTop);
             return this;
         };
         pop := procedure() {
