@@ -4,6 +4,18 @@ extractTokens := procedure(s) {
     tokenList := [];
     scan (s) {
         regex '0|[1-9][0-9]*' as [ number ]: tokenList += [ int(number) ];
+        regex 'exp'           as operator  : tokenList += operator;
+        regex 'log'           as operator  : tokenList += operator;
+        regex 'sin'           as operator  : tokenList += operator;
+        // regex 'cos'           as operator  : tokenList += operator;
+        // regex 'tan'           as operator  : tokenList += operator;
+        // regex 'asin'          as operator  : tokenList += operator;
+        // regex 'acos'          as operator  : tokenList += operator;
+        // regex 'atan'          as operator  : tokenList += operator;
+        regex 'sqrt'          as operator  : tokenList += operator;
+        // regex 'x'             as operator  : tokenList += operator;
+        regex 'e'             as operator  : tokenList += operator;
+        regex 'Pi'            as operator  : tokenList += operator;
         regex '\*\*'          as operator  : tokenList += operator;
         regex '[+\-*/%()]'    as operator  : tokenList += operator;
         regex '[ \t]'                      : // skip
@@ -18,12 +30,19 @@ class calculator(s) {
 
   static {
     evaluate := procedure() {
+        print(mTokenStack);
         while (!mTokenStack.isEmpty()) {
             if (isInteger(mTokenStack.top())) {
                 number := mTokenStack.top(); mTokenStack.pop();
                 mArguments.push(number);
                 continue;
             } 
+            if (mTokenStack.top() in { "e", "Pi" }) {
+                number := mathConst(mTokenStack.top());
+                mTokenStack.pop();
+                mArguments.push(number);
+                continue;
+            }
             nextOp := mTokenStack.top(); mTokenStack.pop();
             if (mOperators.isEmpty() || nextOp == "(") {
                 mOperators.push(nextOp);
@@ -43,22 +62,43 @@ class calculator(s) {
         return mArguments.top();
     };
     evalBefore := procedure(stackOp, nextOp) {
-        prec := { ["+", 1], ["-", 1], ["*", 2], ["/", 2], ["%", 2], ["**",3] };
+        prec := {
+            ["+", 1],
+            ["-", 1],
+            ["*", 2],
+            ["/", 2],
+            ["%", 2],
+            ["**", 3],
+            ["log", 3],
+            ["sqrt", 3],
+            ["sin", 3],
+            ["exp", 3]
+        };
         if (stackOp == "(") { return false;  }
         if (prec[stackOp] > prec[nextOp]) {
             return true;
         } else if (prec[stackOp] == prec[nextOp]) {
             if (stackOp == nextOp) {
-                return stackOp in { "+", "-", "*", "/", "%" };
+                return stackOp in { "+", "-", "*", "/", "%", "log", "sqrt", "sin", "exp" };
             }
             return true;
         } 
         return false;
     };
     popAndEvaluate := procedure() {
-        rhs := mArguments.top(); mArguments.pop();
-        lhs := mArguments.top(); mArguments.pop();
         op  := mOperators.top(); mOperators.pop();
+        rhs := mArguments.top(); mArguments.pop();
+        if (op in { "log", "sqrt", "sin", "exp" }) {
+            match (op) {
+                case "log": result := log(rhs);
+                case "sqrt": result := sqrt(rhs);
+                case "sin": result := sin(rhs);
+                case "exp": result := exp(rhs);
+            }
+            mArguments.push(result);
+            return;
+        }
+        lhs := mArguments.top(); mArguments.pop();
         match (op) {
             case "+" : result := lhs + rhs;
             case "-" : result := lhs - rhs;
@@ -74,5 +114,5 @@ class calculator(s) {
 }
 
 // c := calculator("1+2*3**4-5/2");
-c := calculator("(1+2)*(3-4)");
+c := calculator("exp(1)");
 print(c.evaluate());
