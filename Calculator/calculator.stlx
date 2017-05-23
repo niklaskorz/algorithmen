@@ -85,6 +85,9 @@ class calculator(tl, x) {
         if (prec[stackOp] > prec[nextOp]) {
             return true;
         } else if (prec[stackOp] == prec[nextOp]) {
+            if (prec[stackOp] == 4) {
+                return false;
+            }
             if (stackOp == nextOp) {
                 return stackOp in { "+", "-", "*", "/", "%" };
             }
@@ -138,10 +141,11 @@ computeZero := procedure() {
         print("x0 = $zero$");
     }
 };
-/*
-tl := extractTokens("sin sin x");
+
+tl := extractTokens("log exp 5");
 c := calculator(tl, 2);
-tl2 := extractTokens("sin(sin(x))");
+print(c.evaluate());
+/*tl2 := extractTokens("sin(sin(x))");
 c2 := calculator(tl, 2);
 print(c.evaluate() == c2.evaluate());*/
-computeZero();
+//computeZero();
