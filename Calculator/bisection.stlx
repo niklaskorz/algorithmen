@@ -1,0 +1,54 @@
+// Find the zero of the function f in the intervall [a, b].  The number
+// digits is the number of digits required.
+// This function does only work if either f(a) <= 0 <= f(b) or 
+// f(a) >= 0 >= f(b).  Also, the function f is required to be smooth.
+findZero := procedure(f, a, b, n) {
+    assert(a < b, "a has to be less than b");   
+    assert(f(a) < 0 && 0 < f(b), "we need f($a$) < 0 and f($b$) > 0");
+    for (k in [1 .. n]) {
+        c := 1/2 * (a + b); 
+        if (f(c) < 0) {
+            a := c; 
+        } else if (f(c) > 0) {
+            b := c; 
+        } else {
+            return c;
+        }
+        if (isRational(a) && isRational(b)) {
+            print("a = $nDecimalPlaces(a, 40)$");
+            print("b = $nDecimalPlaces(b, 40)$");
+        } else {
+            print("a = $a$, b = $b$, $f(a)$, $f(b)$");
+        }
+    }
+    return 1/2 * (a + b);
+};
+root3 := procedure(x) {
+    return x * x * x - 2;
+};
+// r3 := findZero(root3, 1, 2, 136);
+
+// print("2 ** (1/3) = $nDecimalPlaces(r3, 42)$");
+// print("\n\n\n");
+
+root2 := procedure(x) {
+    return x * x - 2;
+};
+
+r2 := findZero(root2, 1, 2, 136);
+
+print("sqrt(2) = $nDecimalPlaces(r2, 42)$");
+print("\n\n\n");
+
+cosXEqualsX := procedure(x) {
+    return x - cos(x);
+};
+
+// x := findZero(cosXEqualsX, 0.0, 1.0, 40);
+// print("solution of x = cos(x), $x$");
+
+// x := findZero(x |-> -cos(x), 1.0, 2.0, 40);
+// pi := mathConst("pi");
+
+// print("solution of 0 = cos(x), $x$");
+// print("difference: $x - pi/2$");
