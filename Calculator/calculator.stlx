@@ -1,4 +1,5 @@
 load("stack-array.stlx");
+load("bisection.stlx");
 
 extractTokens := procedure(s) {
     tokenList := [];
@@ -13,7 +14,7 @@ extractTokens := procedure(s) {
         // regex 'acos'          as operator  : tokenList += operator;
         // regex 'atan'          as operator  : tokenList += operator;
         regex 'sqrt'          as operator  : tokenList += operator;
-        // regex 'x'             as operator  : tokenList += operator;
+        regex 'x'             as operator  : tokenList += operator;
         regex 'e'             as operator  : tokenList += operator;
         regex 'Pi'            as operator  : tokenList += operator;
         regex '\*\*'          as operator  : tokenList += operator;
@@ -23,10 +24,11 @@ extractTokens := procedure(s) {
     return tokenList;
 };
 
-class calculator(s) {
-    mTokenStack := createStack(extractTokens(s));
+class calculator(tl, x) {
+    mTokenStack := createStack(tl);
     mArguments  := stack();
     mOperators  := stack();
+    mVarX := x;
 
   static {
     evaluate := procedure() {
@@ -41,6 +43,11 @@ class calculator(s) {
                 number := mathConst(mTokenStack.top());
                 mTokenStack.pop();
                 mArguments.push(number);
+                continue;
+            }
+            if (mTokenStack.top() == "x") {
+                mTokenStack.pop();
+                mArguments.push(mVarX);
                 continue;
             }
             nextOp := mTokenStack.top(); mTokenStack.pop();
@@ -69,17 +76,17 @@ class calculator(s) {
             ["/", 2],
             ["%", 2],
             ["**", 3],
-            ["log", 3],
-            ["sqrt", 3],
-            ["sin", 3],
-            ["exp", 3]
+            ["log", 4],
+            ["sqrt", 4],
+            ["sin", 4],
+            ["exp", 4]
         };
         if (stackOp == "(") { return false;  }
         if (prec[stackOp] > prec[nextOp]) {
             return true;
         } else if (prec[stackOp] == prec[nextOp]) {
             if (stackOp == nextOp) {
-                return stackOp in { "+", "-", "*", "/", "%", "log", "sqrt", "sin", "exp" };
+                return stackOp in { "+", "-", "*", "/", "%" };
             }
             return true;
         } 
@@ -113,6 +120,28 @@ class calculator(s) {
   }
 }
 
-// c := calculator("1+2*3**4-5/2");
-c := calculator("exp(1)");
-print(c.evaluate());
+computeZero := procedure() {
+    s  := read("enter function: ");
+    tl := extractTokens(s);
+    left_Boundary := read("Enter left  boundary: ");
+    rightBoundary := read("Enter right boundary: ");
+    f  := closure(x) {
+        c := calculator(tl, x);
+        return c.evaluate();
+    };
+    zero := findZero(f, left_Boundary, rightBoundary, 40);
+    print(zero);
+    print(nDecimalPlaces(zero, 10));
+    if (isRational(zero)) {
+        print("x0 = $nDecimalPlaces(zero, 10)$");
+    } else {
+        print("x0 = $zero$");
+    }
+};
+/*
+tl := extractTokens("sin sin x");
+c := calculator(tl, 2);
+tl2 := extractTokens("sin(sin(x))");
+c2 := calculator(tl, 2);
+print(c.evaluate() == c2.evaluate());*/
+computeZero();
