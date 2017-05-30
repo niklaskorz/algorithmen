@@ -1,0 +1,86 @@
+class Node(cmp, k, v, l, r) {
+    cmp := cmp;
+    k := k;
+    v := v;
+    l := l;
+    r := r;
+
+    static {
+        isNil := [] |=> false;
+
+        find := procedure(k) {
+            if (k == this.k) {
+                return v;
+            }
+            if (cmp(k, this.k)) {
+                return l.find(k);
+            }
+            return r.find(k);
+        };
+
+        insert := procedure(k, v) {
+            if (k == this.k) {
+                return Node(cmp, k, v, l, r);
+            }
+            if (cmp(k, this.k)) {
+                return Node(cmp, this.k, this.v, l.insert(k, v), r);
+            }
+            return Node(cmp, this.k, this.v, l, r.insert(k, v));
+        };
+
+        delMin := procedure() {
+            if (l.isNil()) {
+                return [r, k, v];
+            }
+            [l2, k2, v2] := l.delMin();
+            return [Node(cmp, k, v, l2, r), k2, v2];
+        };
+
+        deleteRoot := procedure() {
+            if (l.isNil()) {
+                return r;
+            }
+            if (r.isNil()) {
+                return l;
+            }
+            [r2, k2, v2] := r.delMin();
+            return Node(cmp, k2, v2, l, r2);
+        };
+
+        delete := procedure(k) {
+            if (k == this.k) {
+                return this.deleteRoot();
+            }
+            if (cmp(k, this.k)) {
+                return Node(cmp, this.k, v, l.delete(k), r);
+            }
+            return Node(cmp, this.k, v, l, r.delete(k));
+        };
+    }
+}
+
+class Nil(cmp) {
+    cmp := cmp;
+
+    static {
+        isNil := [] |=> true;
+        find := k |=> om;
+        insert := [k, v] |=> Node(cmp, k, v, this, this);
+        delete := k |=> this;
+    }
+}
+
+class Map(cmp) {
+    root := Nil(cmp);
+    cmp := cmp;
+
+    static {
+        find := k |=> root.find(k);
+        insert := procedure(k, v) {
+            this.root := root.insert(k, v);
+        };
+        delete := procedure(k) {
+            this.root := root.delete(k);
+        };
+    }
+}

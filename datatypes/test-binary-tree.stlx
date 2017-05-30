@@ -1,0 +1,31 @@
+load("ordered-binary-tree.stlx");
+
+lessThan := procedure(a, b) {
+    return compare(a, b) == -1;
+};
+
+demo := procedure(cmp) {
+    m := Map(cmp);
+    m.insert("anton",  123);
+    m.insert("hugo" ,  345);
+    m.insert("gustav", 789);
+    m.insert("jens",   234);
+    m.insert("hubert", 432);
+    m.insert("andre",  342);
+    m.insert("philipp",  342);
+    m.insert("rene",   345);
+    print("\n$m$\n");
+    print("m.find(\"anton\" ) = $m.find(\"anton\" )$");
+    print("m.find(\"hugo\"  ) = $m.find(\"hugo\"  )$");
+    print("m.find(\"gustav\") = $m.find(\"gustav\")$");
+    print("m.find(\"jens\"  ) = $m.find(\"jens\"  )$");
+    m.delete("philipp");
+    print("\n$m$\n");
+    print("m.find(\"anton\" ) = $m.find(\"anton\" )$");
+    print("m.find(\"hugo\"  ) = $m.find(\"hugo\")  $");
+    print("m.find(\"gustav\") = $m.find(\"gustav\")$");
+    print("m.find(\"jens\"  ) = $m.find(\"jens\")  $");
+    return m;
+};
+
+demo(lessThan);
