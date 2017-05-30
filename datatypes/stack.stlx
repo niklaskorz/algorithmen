@@ -1,0 +1,36 @@
+class stack() {
+    elements := [];
+
+    static {
+        isEmpty := procedure() {
+            return #elements == 0;
+        };
+        push := procedure(x) {
+            this.elements += [x];
+            return this;
+        };
+        pop := procedure() {
+            assert(!this.isEmpty(), "Empty stack cannot be popped");
+            this.elements := elements[..#elements - 1];
+            return this;
+        };
+        top := procedure() {
+            if (this.isEmpty()) {
+                return om;
+            }
+            return elements[#elements];
+        };
+        f_str := procedure() {
+            return "Stack(" + join(elements, ", ") + ")";
+        };
+    }   
+}
+
+createStackFromList := procedure(l) {
+    s := stack();
+    n := #l;
+    for (i in [n, n - 1 .. 1]) {
+        s.push(l[i]);
+    }
+    return s;
+};

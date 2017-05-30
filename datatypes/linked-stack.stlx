@@ -1,0 +1,54 @@
+// Stack with linked list
+
+class node(data, next) {
+    data := data;
+    next := next;
+
+    static {
+        equals := procedure(rhs) {
+            if (rhs == om) {
+                return false;
+            }
+            return data == rhs.data && next == rhs.next;
+        };
+        toList := procedure() {
+            l := [data];
+            if (next != om) {
+                l := next.toList() + l;
+            }
+            return l;
+        };
+    }
+}
+
+class stack() {
+    mTop := om;
+
+    static {
+        isEmpty := procedure() {
+            return mTop == om;
+        };
+        push := procedure(x) {
+            this.mTop := node(x, mTop);
+            return this;
+        };
+        pop := procedure() {
+            assert(!this.isEmpty(), "Empty stack cannot be popped");
+            this.mTop := mTop.next;
+            return this;
+        };
+        top := procedure() {
+            if (this.isEmpty()) {
+                return om;
+            }
+            return mTop.data;
+        };
+        f_str := procedure() {
+            l := "";
+            if (!this.isEmpty()) {
+                l := join(mTop.toList(), ", ");
+            }
+            return "Stack($l$)";
+        };
+    }
+} 
