@@ -1,86 +1,85 @@
 class Node(cmp, k, v, l, r) {
-    cmp := cmp;
-    k := k;
-    v := v;
-    l := l;
-    r := r;
+    mCompare := cmp;
+    mKey := k;
+    mValue := v;
+    mLeft := l;
+    mRight := r;
 
     static {
         isNil := [] |=> false;
 
         find := procedure(k) {
-            if (k == this.k) {
-                return v;
+            if (k == mKey) {
+                return mValue;
             }
-            if (cmp(k, this.k)) {
-                return l.find(k);
+            if (mCompare(k, mKey)) {
+                return mLeft.find(k);
             }
-            return r.find(k);
+            return mRight.find(k);
         };
 
         insert := procedure(k, v) {
-            if (k == this.k) {
-                return Node(cmp, k, v, l, r);
+            if (k == mKey) {
+                return Node(mCompare, k, v, mLeft, mRight);
             }
-            if (cmp(k, this.k)) {
-                return Node(cmp, this.k, this.v, l.insert(k, v), r);
+            if (mCompare(k, mKey)) {
+                return Node(mCompare, mKey, mValue, mLeft.insert(k, v), mRight);
             }
-            return Node(cmp, this.k, this.v, l, r.insert(k, v));
+            return Node(mCompare, mKey, mValue, mLeft, mRight.insert(k, v));
         };
 
         delMin := procedure() {
-            if (l.isNil()) {
-                return [r, k, v];
+            if (mLeft.isNil()) {
+                return [mRight, mKey, mValue];
             }
-            [l2, k2, v2] := l.delMin();
-            return [Node(cmp, k, v, l2, r), k2, v2];
+            [l2, k2, v2] := mLeft.delMin();
+            return [Node(mCompare, mKey, mValue, l2, mRight), k2, v2];
         };
 
         deleteRoot := procedure() {
-            if (l.isNil()) {
-                return r;
+            if (mLeft.isNil()) {
+                return mRight;
             }
-            if (r.isNil()) {
-                return l;
+            if (mRight.isNil()) {
+                return mLeft;
             }
-            [r2, k2, v2] := r.delMin();
-            return Node(cmp, k2, v2, l, r2);
+            [r2, k2, v2] := mRight.delMin();
+            return Node(mCompare, k2, v2, mLeft, r2);
         };
 
         delete := procedure(k) {
-            if (k == this.k) {
+            if (k == mKey) {
                 return this.deleteRoot();
             }
-            if (cmp(k, this.k)) {
-                return Node(cmp, this.k, v, l.delete(k), r);
+            if (mCompare(k, mKey)) {
+                return Node(mCompare, mKey, mValue, mLeft.delete(k), mRight);
             }
-            return Node(cmp, this.k, v, l, r.delete(k));
+            return Node(mCompare, mKey, mValue, mLeft, mRight.delete(k));
         };
     }
 }
 
 class Nil(cmp) {
-    cmp := cmp;
+    mCompare := cmp;
 
     static {
         isNil := [] |=> true;
         find := k |=> om;
-        insert := [k, v] |=> Node(cmp, k, v, this, this);
+        insert := [k, v] |=> Node(mCompare, k, v, this, this);
         delete := k |=> this;
     }
 }
 
 class Map(cmp) {
-    root := Nil(cmp);
-    cmp := cmp;
+    mRoot := Nil(cmp);
 
     static {
-        find := k |=> root.find(k);
+        find := k |=> mRoot.find(k);
         insert := procedure(k, v) {
-            this.root := root.insert(k, v);
+            this.mRoot := mRoot.insert(k, v);
         };
         delete := procedure(k) {
-            this.root := root.delete(k);
+            this.mRoot := mRoot.delete(k);
         };
     }
 }
